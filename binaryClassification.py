@@ -6,6 +6,7 @@ Every notebook attached to a cluster running Apache Spark 2.0.0 and above has a 
 Spark session isolation is enabled by default. You can also use global temporary views to share temporary views across notebooks. See Create View. To disable Spark session isolation, set spark.databricks.session.share to true in the Spark configuration.
 '''
 
+
 from pyspark.sql import SparkSession
 spark = SparkSession.builder.appName('sparkClassfication1').getOrCreate()
 
