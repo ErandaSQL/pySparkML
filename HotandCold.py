@@ -1,3 +1,30 @@
+'''
+Business problem - at a large shopping mall the management wants to know how shoppers respond to different temperature settings. The 
+                   management has got hold of data from a different shopping mall that shows how shoppers reacted to different 
+                   temperature settings. Based on the data gathered, the management predict what shoppers will feel for different 
+                   temperature settings.
+
+Analytic approach -shoppers reaction is recorded as a label (Hot\ Cold), therefore output is a categorical value. Hence classification\ 
+                   logistic regression is used.
+
+Data requirments - temparature and shoppers reaction
+
+Data collection - HotandCold.csv
+
+Data undertanding - see below EDA section
+
+Data preparation - see below DW (data wrangle) section
+
+Modeling - 
+
+Evaluation -
+
+Deployment -
+
+Feedback -
+
+'''
+
 # Databricks notebook source
 from pyspark.sql import SparkSession
 spark = SparkSession.builder.appName('HotandCold').getOrCreate()
