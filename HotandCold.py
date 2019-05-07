@@ -11,17 +11,16 @@ Data requirments - temparature and shoppers reaction
 
 Data collection - HotandCold.csv
 
-Data undertanding - see below EDA section
+Data undertanding - skipped as data is preprocessed
 
-Data preparation - see below DW (data wrangle) section
+Data preparation - skipped as data is preprocessed
 
-Modeling - 
+Modeling - see below 
 
-Evaluation -
+Evaluation -see below 
 
-Deployment -
+Deployment -see below 
 
-Feedback -
 
 '''
 
@@ -32,7 +31,7 @@ spark = SparkSession.builder.appName('HotandCold').getOrCreate()
 df_f=spark.sql('select * from HotandCold')
 df_f.show()
 
-# COMMAND ----------
+
 
 from pyspark.ml.feature import OneHotEncoderEstimator, StringIndexer, VectorAssembler
 
@@ -46,7 +45,7 @@ assembler = VectorAssembler(inputCols=assemblerInputs, outputCol="features")
 stages += [assembler]
 
 
-# COMMAND ----------
+
 
 from pyspark.ml import Pipeline  
 df_dw=df_f
@@ -56,7 +55,7 @@ pipelineModel = partialPipeline.fit(df_dw)
 preppedDataDF = pipelineModel.transform(df_dw)
 preppedDataDF.show()
 
-# COMMAND ----------
+
 
 cols=df_dw.columns
 selectedCols = ['label', 'features'] + cols
@@ -64,25 +63,25 @@ preppedDataDF = preppedDataDF.select(selectedCols)
 preppedDataDF.show()
 print(preppedDataDF.count())
 
-# COMMAND ----------
 
 train, test = preppedDataDF.randomSplit([0.7, 0.3], seed = 2018)
 print("Training Dataset Count: " + str(train.count()))
 print("Test Dataset Count: " + str(test.count()))
 
-# COMMAND ----------
 
+#Model creation
 from pyspark.ml.classification import LogisticRegression
 lr = LogisticRegression(featuresCol = 'features', labelCol = 'label', maxIter=10)
 lrModel = lr.fit(train)
 
 predictions = lrModel.transform(test)
 
-#from pyspark.ml.evaluation import BinaryClassificationEvaluator
-#evaluator = BinaryClassificationEvaluator()
-#print('Test Area Under ROC', evaluator.evaluate(predictions))
+#Model evaluation
+from pyspark.ml.evaluation import BinaryClassificationEvaluator
+evaluator = BinaryClassificationEvaluator()
+print('Test Area Under ROC', evaluator.evaluate(predictions))
 
-# COMMAND ----------
+
 
 trainingSummary = lrModel.summary
 
@@ -95,13 +94,15 @@ recall = trainingSummary.weightedRecall
 print("Accuracy: %s\nFPR: %s\nTPR: %s\nF-measure: %s\nPrecision: %s\nRecall: %s"
       % (accuracy, falsePositiveRate, truePositiveRate, fMeasure, precision, recall))
 
-# COMMAND ----------
 
+#saving a model
 lrModel.write().overwrite().save('lrModel_v1')
+
+#Loading a model
 loadedModel=lrModel.load('lrModel_v1')
 
-# COMMAND ----------
 
+#using a loading model for predicting
 from pyspark.mllib.linalg import Vectors
 
 productionDataSchema = StructType([StructField("temperature", DoubleType(), True)])
